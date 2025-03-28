@@ -10,11 +10,12 @@ init {
     vars.inGame = current.status == vars.inGame
     vars.levelChanged = current.level != old.level
     vars.timerStarted = current.timer == 90
+    vars.firstLevel = current.level == 1
 }
 
 // Auto-reset, useful when already in a run
 reset {
-    if (current.level == 1) {
+    if (vars.firstLevel) {
         if (vars.levelChanged) {
             print("Restarting game from another level");
             return true;
@@ -28,7 +29,7 @@ reset {
 }
 
 start {
-    if (vars.inGame && vars.timerStarted && current.level == 1) {
+    if (vars.inGame && vars.timerStarted && vars.firstLevel) {
         print("Starting a new game");
         return true;
     }
