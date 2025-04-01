@@ -5,44 +5,50 @@ state("BRAINPC") {
     int status : "BRAINPC.EXE", 0xDD80;
 }
 
-// Variables
-init {
-    vars.inGame = current.status == vars.inGame
-    vars.levelChanged = current.level != old.level
-    vars.timerStarted = current.timer == 90
-    vars.firstLevel = current.level == 1
-}
-
-// Auto-reset, useful when already in a run
-reset {
-    if (vars.firstLevel) {
-        if (vars.levelChanged) {
-            print("Restarting game from another level");
-            return true;
-        }
-
-        if (vars.timerStarted && current.timer != old.timer) {
-            print("Restarting game from level 1");
-            return true;
-        }
-    }
+startup {
+    // Needed in `update` to reset an `Ended` timer
+    vars.TimerModel = new TimerModel { CurrentState = timer };
 }
 
 start {
-    if (vars.inGame && vars.timerStarted && vars.firstLevel) {
-        print("Starting a new game");
+    if (vars.gameStarted) {
+        print("New game");
         return true;
     }
 }
 
 split {
-    if (current.status != old.status && !vars.inGame) {
-        print("From a level back to main menu AKA Game over")
+    if (current.status != 1) {
+        print("Game Over");
         return true;
     }
 
     if (vars.levelChanged) {
-        print("Level changed");
+        print("Split");
         return true;
+    }
+}
+
+reset {
+    if (current.level == 1) {
+        if (vars.levelChanged) {
+            print("Restarting from another level");
+            return true;
+        }
+
+        if (current.timer > old.timer) {
+            print("Restarting from first level");
+            return true;
+        }
+    }
+}
+
+update {
+    vars.levelChanged = current.level != old.level;
+    vars.gameStarted = current.status == 1 && current.level == 1 && current.timer > old.timer;
+
+    if (timer.CurrentPhase == TimerPhase.Ended && settings.ResetEnabled && vars.gameStarted) {
+        print("Restarting from main menu");
+        vars.TimerModel.Reset();  // Reset `Ended` timer
     }
 }
