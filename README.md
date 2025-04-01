@@ -1,6 +1,6 @@
 # LiveSplit.BrainDrain
 
-[Brain Drain](https://archive.org/details/braindrain) autosplitter for LiveSplit written in ASL (Auto-Splitter Language).
+[Brain Drain](https://archive.org/details/braindrain) autosplitter for [LiveSplit](https://github.com/LiveSplit/LiveSplit.AutoSplitters) written in ASL (Auto-Splitter Language).
 
 Features:
 
