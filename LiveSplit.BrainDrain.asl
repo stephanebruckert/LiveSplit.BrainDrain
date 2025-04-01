@@ -18,7 +18,7 @@ start {
 }
 
 split {
-    if (current.status != 1) {
+    if (!vars.inGame) {
         print("Game Over");
         return true;
     }
@@ -30,13 +30,13 @@ split {
 }
 
 reset {
-    if (current.level == 1) {
+    if (vars.firstLevel) {
         if (vars.levelChanged) {
             print("Restarting from another level");
             return true;
         }
 
-        if (current.timer > old.timer) {
+        if (vars.timerStarted) {
             print("Restarting from first level");
             return true;
         }
@@ -44,8 +44,11 @@ reset {
 }
 
 update {
+    vars.inGame == current.status == 1;
+    vars.firstLevel = current.level == 1;
     vars.levelChanged = current.level != old.level;
-    vars.gameStarted = current.status == 1 && current.level == 1 && current.timer > old.timer;
+    vars.timerStarted = current.timer > old.timer;
+    vars.gameStarted = vars.inGame && vars.firstLevel && vars.timerStarted;
 
     if (timer.CurrentPhase == TimerPhase.Ended && settings.ResetEnabled && vars.gameStarted) {
         print("Restarting from main menu");
